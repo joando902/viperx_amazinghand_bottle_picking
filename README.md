@@ -1,136 +1,81 @@
-# ViperX300S Bottle Picking
+# ViperX 300S + AmazingHand Bottle Picking
 
-This repository contains a bottle detection and robotic grasping system for the **Interbotix ViperX 300S** robotic arm.
+This project integrates the **ViperX 300S robotic arm**, **AmazingHand**, **Intel RealSense camera**, and **YOLOv8** to detect and pick bottles.
 
 The system uses:
 
-- ViperX 300S
-- Intel RealSense RGB-D Camera
+- ViperX 300S robotic arm
+- AmazingHand robotic hand
+- Intel RealSense camera
+- YOLOv8 object detection
 - ROS 2
-- MoveIt 2
-- YOLOv8
-- Hand-Eye Calibration
-- TF Coordinate Transformation
-- Gripper Control
-
-The system detects a bottle using the RealSense camera, obtains the bottle position, transforms the position into the robot coordinate frame, and controls the ViperX 300S to grasp the bottle.
+- MoveIt
+- Docker
 
 ---
 
-# 1. Download the Repository
+# 1. AmazingHand
 
-Clone the repository from GitHub:
+## Start AmazingHand Docker
 
-```bash
-git clone https://github.com/joando902/viperx300s-bottle-picking.git
-```
-
-Enter the project folder:
+Start the AmazingHand Docker container:
 
 ```bash
-cd viperx300s-bottle-picking
+docker start amazing_hand_container
 ```
+
+Enter the container and set the ROS domain ID:
+
+```bash
+docker exec -it -e ROS_DOMAIN_ID=77 amazing_hand_container bash
+```
+
+## Start AmazingHand
+
+Inside the AmazingHand Docker container, launch the hand:
+
+```bash
+ros2 launch paxini_tactile amazing_hand.launch.py
+```
+
+Keep this terminal running.
 
 ---
 
-# 2. Build
+# 2. ViperX 300S
 
-Build the ROS 2 environment:
-
-```bash
-./cpu_run.sh build
-```
-
----
-
-# 3. Start Docker
-
-Start the Docker development environment:
+Go to the ViperX ROS 2 project directory and start the Docker development environment:
 
 ```bash
 ./cpu_run.sh dev
 ```
 
-Open another terminal and enter the Docker container:
+Then open another terminal and enter the ViperX Docker container:
 
 ```bash
 docker exec -it dev bash
 ```
 
----
-
-# 4. Motor Calibration
-
-Before using the robotic arm, confirm that the motor positions are calibrated correctly.
-
-Use **DYNAMIXEL Wizard 2.0** to check the Present Position of each motor and set the required Homing Offset.
-
-The goal is to make the physical ViperX 300S position match the robot position shown in RViz.
-
-After calibration, confirm that:
-
-```text
-Physical Robot Position
-        ≈
-RViz Robot Position
-```
+All of the following ViperX commands should be executed inside the `dev` Docker container.
 
 ---
 
-# 5. Camera / Hand-Eye Calibration
+# Terminal 1 — RealSense Camera
 
-Before running the bottle picking system, the RealSense camera position relative to the ViperX 300S must be calibrated.
-
-The hand-eye calibration is used to obtain the transformation between:
-
-```text
-Camera Coordinate Frame
-        ↓
-Robot Base Coordinate Frame
-```
-
-After calibration, the transformation result is used by the system to convert the detected bottle position into the ViperX 300S coordinate frame.
-
-Make sure the camera position has not changed after calibration.
-
----
-
-# 6. Run the System
-
-The complete system uses five terminals.
-
-Recommended startup order:
-
-```text
-Terminal 1 → RealSense Camera
-Terminal 2 → ViperX 300S + MoveIt
-Terminal 3 → YOLOv8 Bottle Detection
-Terminal 4 → Coordinate Transformation
-Terminal 5 → Bottle Picking
-```
-
-Each terminal should first enter the Docker container:
-
-```bash
-docker exec -it dev bash
-```
-
----
-
-## Terminal 1 — RealSense Camera
-
-Start the RealSense camera.
+Start the Intel RealSense camera with aligned depth:
 
 ```bash
 ros2 launch realsense2_camera rs_launch.py \
   align_depth.enable:=true
 ```
 
+Keep this terminal running.
+
 ---
 
-## Terminal 2 — ViperX 300S + MoveIt
+# Terminal 2 — ViperX 300S + MoveIt
 
-Start the ViperX 300S robotic arm and MoveIt.
+Start the ViperX 300S robotic arm and MoveIt:
 
 ```bash
 ros2 launch interbotix_xsarm_moveit_interface xsarm_moveit_interface.launch.py \
@@ -140,32 +85,44 @@ ros2 launch interbotix_xsarm_moveit_interface xsarm_moveit_interface.launch.py \
   use_moveit_interface_gui:=false
 ```
 
+RViz will open and display the ViperX 300S robot.
+
+Keep this terminal running.
+
 ---
 
-## Terminal 3 — YOLOv8 Bottle Detection
+# Terminal 3 — YOLOv8 Bottle Detection
 
-Start YOLOv8 bottle detection.
+Start YOLOv8 bottle detection:
 
 ```bash
 ros2 launch interbotix_xsarm_perception bottle_detection.launch.py \
   model_path:=/home/interbotix_ws/src/yolov8n.pt
 ```
 
+This node detects bottles from the RealSense camera image.
+
+Keep this terminal running.
+
 ---
 
-## Terminal 4 — Coordinate Transformation
+# Terminal 4 — Coordinate Transformation
 
-Start the hand-eye coordinate transformation.
+Start the hand-eye coordinate transformation:
 
 ```bash
 ros2 launch interbotix_xsarm_perception hand_eye.launch.py
 ```
 
+This node transforms the detected bottle position from the camera coordinate frame to the robot coordinate frame.
+
+Keep this terminal running.
+
 ---
 
-## Terminal 5 — Bottle Picking
+# Terminal 5 — Bottle Picking
 
-Start the bottle picking program.
+Run the bottle picking program:
 
 ```bash
 ros2 run interbotix_xsarm_perception viperx_amazing_hand_bottle_pick.py --ros-args \
@@ -178,53 +135,57 @@ ros2 run interbotix_xsarm_perception viperx_amazing_hand_bottle_pick.py --ros-ar
   -p post_grasp_velocity_scale:=0.25
 ```
 
-After grasping the bottle, the end effector rises 10 cm, moves 10 cm to the
-robot's left (`+Y` in `vx300s/base_link`), lowers 10 cm, and sends `open` to
-the Amazing Hand controller. The post-grasp Cartesian motion runs at 25% of
-the configured joint velocity.
+The robot will use the detected bottle position to perform the picking motion with the AmazingHand.
 
 ---
 
-# 7. System Flow
+# Recommended Startup Order
+
+Start the system in the following order:
+
+1. AmazingHand Docker
+2. AmazingHand ROS 2 node
+3. ViperX Docker
+4. RealSense Camera
+5. ViperX 300S + MoveIt
+6. YOLOv8 Bottle Detection
+7. Coordinate Transformation
+8. Bottle Picking Program
+
+---
+
+# System Overview
 
 ```text
-Download Repository
-        ↓
-Build
-        ↓
-Start Docker
-        ↓
-Motor Calibration
-        ↓
-Camera / Hand-Eye Calibration
-        ↓
-Start RealSense Camera
-        ↓
-Start ViperX 300S + MoveIt
-        ↓
-Start YOLOv8
-        ↓
-Start Coordinate Transformation
-        ↓
-Start Bottle Picking
-        ↓
-Robot Grasps Bottle
+RealSense Camera
+       │
+       ▼
+ YOLOv8 Detection
+       │
+       ▼
+Bottle 3D Position
+       │
+       ▼
+Coordinate Transformation
+       │
+       ▼
+ ViperX 300S + MoveIt
+       │
+       ▼
+   AmazingHand
+       │
+       ▼
+  Bottle Picking
 ```
 
 ---
 
-# Terminal Summary
+# ROS Domain ID
 
-| Terminal | Function |
-|---|---|
-| Terminal 1 | Start RealSense camera |
-| Terminal 2 | Start ViperX 300S and MoveIt |
-| Terminal 3 | Start YOLOv8 bottle detection |
-| Terminal 4 | Start coordinate transformation |
-| Terminal 5 | Start bottle picking |
+The AmazingHand container uses:
 
----
+```bash
+ROS_DOMAIN_ID=77
+```
 
-# Author
-
-GitHub: `joando902`
+Make sure that ROS 2 nodes that need to communicate with AmazingHand are configured to use the same ROS domain ID when required.
