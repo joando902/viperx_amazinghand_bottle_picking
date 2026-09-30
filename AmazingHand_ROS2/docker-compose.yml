@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  amazing_hand:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: amazing_hand:humble
+    container_name: amazing_hand_container
+    network_mode: host
+    ipc: host
+    privileged: true
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - /dev:/dev
+      - ./amazing_hand:/root/amazing_hand
+    stdin_open: true
+    tty: true

@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd"
+            schematypens="http://www.w3.org/2001/XMLSchema"?>
+<!--
+  interbotix_xsarm_ros_control/package.xml
+  ─────────────────────────────────────────
+  ❶ *移除* 與 interbotix_xsarm_moveit 的 build/export 依賴（根源迴圈）
+  ❷ 將僅於執行期才需要的套件改列 <exec_depend>
+     · interbotix_xsarm_descriptions
+     · rosbridge_server
+  ❸ 明確標示 build_depend / build_export_depend，方便 colcon 排序
+-->
+<package format="3">
+  <name>interbotix_xsarm_ros_control</name>
+  <version>0.0.0</version>
+  <description>ROS 2 control interface for Interbotix xS Arms</description>
+
+  <maintainer email="luke@trossenrobotics.com">Luke Schmitt</maintainer>
+  <author email="trsupport@trossenrobotics.com">Solomon Wiznitzer</author>
+  <license>BSD</license>
+
+  <!-- build system -->
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>ament_cmake_python</buildtool_depend>
+
+  <!-- ──────── build-time dependencies (code must compile against) ──────── -->
+  <build_depend>rclpy</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <!-- libraries / headers exported to downstream packages -->
+  <build_export_depend>rclpy</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+
+  <!-- core runtime (also required at build for message generation) -->
+  <depend>interbotix_xsarm_control</depend>
+  <depend>interbotix_xs_ros_control</depend>
+
+  <!-- controller plugins loaded at runtime -->
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>joint_trajectory_controller</exec_depend>
+
+  <!-- descriptions & rosbridge are *runtime* utilities → exec_depend -->
+  <exec_depend>interbotix_xsarm_descriptions</exec_depend>
+  <exec_depend>rosbridge_server</exec_depend>
+
+  <!-- testing -->
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

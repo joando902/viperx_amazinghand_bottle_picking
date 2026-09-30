@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<robot name="amazing_hand">
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.08 0.08 0.02"/>
+      </geometry>
+      <material name="green">
+        <color rgba="0.0 1.0 0.0 1.0"/>
+      </material>
+    </visual>
+  </link>
+
+  <!-- 食指 (Index) -->
+  <link name="index_proximal">
+    <visual>
+      <origin xyz="0 0 0.02" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.04" radius="0.008"/>
+      </geometry>
+      <material name="cyan"><color rgba="0.0 0.8 0.8 1.0"/></material>
+    </visual>
+  </link>
+  <joint name="joint_index_mcp" type="revolute">
+    <parent link="base_link"/>
+    <child link="index_proximal"/>
+    <origin xyz="0.03 0 0.04" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="3.0"/>
+  </joint>
+
+  <link name="index_distal">
+    <visual>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.03" radius="0.006"/>
+      </geometry>
+      <material name="orange"><color rgba="1.0 0.5 0.0 1.0"/></material>
+    </visual>
+  </link>
+  <joint name="joint_index_pip" type="revolute">
+    <parent link="index_proximal"/>
+    <child link="index_distal"/>
+    <origin xyz="0 0 0.04" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="3.0"/>
+  </joint>
+
+  <!-- 中指 (Middle) -->
+  <link name="middle_proximal">
+    <visual>
+      <origin xyz="0 0 0.02" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.04" radius="0.008"/>
+      </geometry>
+      <material name="cyan"/>
+    </visual>
+  </link>
+  <joint name="joint_middle_mcp" type="revolute">
+    <parent link="base_link"/>
+    <child link="middle_proximal"/>
+    <origin xyz="0.01 0 0.04" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="3.0"/>
+  </joint>
+
+  <link name="middle_distal">
+    <visual>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.03" radius="0.006"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+  </link>
+  <joint name="joint_middle_pip" type="revolute">
+    <parent link="middle_proximal"/>
+    <child link="middle_distal"/>
+    <origin xyz="0 0 0.04" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="3.0"/>
+  </joint>
+
+  <!-- 無名指 (Ring) -->
+  <link name="ring_proximal">
+    <visual>
+      <origin xyz="0 0 0.02" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.04" radius="0.008"/>
+      </geometry>
+      <material name="cyan"/>
+    </visual>
+  </link>
+  <joint name="joint_ring_mcp" type="revolute">
+    <parent link="base_link"/>
+    <child link="ring_proximal"/>
+    <origin xyz="-0.01 0 0.04" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="3.0"/>
+  </joint>
+
+  <link name="ring_distal">
+    <visual>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.03" radius="0.006"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+  </link>
+  <joint name="joint_ring_pip" type="revolute">
+    <parent link="ring_proximal"/>
+    <child link="ring_distal"/>
+    <origin xyz="0 0 0.04" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="3.0"/>
+  </joint>
+
+  <!-- 拇指 (Thumb) -->
+  <link name="thumb_proximal">
+    <visual>
+      <origin xyz="0 0 0.02" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.04" radius="0.008"/>
+      </geometry>
+      <material name="cyan"/>
+    </visual>
+  </link>
+  <joint name="joint_thumb_mcp" type="revolute">
+    <parent link="base_link"/>
+    <child link="thumb_proximal"/>
+    <origin xyz="-0.03 0 0.01" rpy="0 -0.5 0.8"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="3.0"/>
+  </joint>
+
+  <link name="thumb_distal">
+    <visual>
+      <origin xyz="0 0 0.015" rpy="0 0 0"/>
+      <geometry>
+        <cylinder length="0.03" radius="0.006"/>
+      </geometry>
+      <material name="orange"/>
+    </visual>
+  </link>
+  <joint name="joint_thumb_pip" type="revolute">
+    <parent link="thumb_proximal"/>
+    <child link="thumb_distal"/>
+    <origin xyz="0 0 0.04" rpy="0 0 0"/>
+    <axis xyz="1 0 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10.0" velocity="3.0"/>
+  </joint>
+</robot>

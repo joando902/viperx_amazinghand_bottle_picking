@@ -1,0 +1,68 @@
+#############################
+###    shared settings    ###
+#############################
+x-common-settings: &common
+  tty: true
+  network_mode: host
+  privileged: true
+  stop_grace_period: 1s
+  devices:
+    - /dev:/dev
+  environment:
+    - DISPLAY=${DISPLAY}
+    - ROS_DOMAIN_ID=77
+   
+############################
+###   shared settings    ###
+############################
+x-workspace-settings: &ws
+  build: 
+    context: ../
+    dockerfile: docker/cpu.dockerfile
+    target: release
+  image: hrcnthu/viperx-300s:default
+
+  volumes:
+    # GUI
+    - $HOME/.Xauthority:/.Xauthority:ro
+    - /tmp/.X11-unix:/tmp/.X11-unix:ro
+    # ROS2 container communication
+    - /dev/shm:/dev/shm:rw
+    # Udev rules 
+    - /dev:/dev:rw
+    - /run/udev:/run/udev
+    - /etc/udev:/etc/udev
+
+    # Workspace
+    - ../apriltag_ws/build:/home/apriltag_ws/build:rw
+    - ../apriltag_ws/install:/home/apriltag_ws/install:rw
+    - ../apriltag_ws/src:/home/apriltag_ws/src:rw
+
+    - ../interbotix_ws/build:/home/interbotix_ws/build:rw
+    - ../interbotix_ws/install:/home/interbotix_ws/install:rw
+    - ../interbotix_ws/src:/home/interbotix_ws/src:rw
+    # Shell Scripts
+    - ../interbotix_ws/rosbridge.sh:/home/interbotix_ws/rosbridge.sh:rw
+
+    # Service scripts
+    - ./services:/home/services:rw
+
+
+##############################
+###   Container Services   ###
+##############################
+services:
+  dev:
+    <<: [*common, *ws]
+    container_name: dev
+    command: ["/bin/bash"]
+
+  build:
+    <<: [*common, *ws]
+    container_name: build
+    command: ["/bin/bash", "-c", "source /home/services/build.sh"]
+
+  rviz-ee:
+    <<: [*common, *ws]
+    container_name: rviz-ee
+    command: ["/bin/bash", "-c", "source /home/services/rviz-ee.sh"]

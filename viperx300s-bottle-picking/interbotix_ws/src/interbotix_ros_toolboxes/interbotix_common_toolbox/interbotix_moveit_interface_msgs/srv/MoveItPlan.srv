@@ -1,0 +1,39 @@
+# Send commands to the moveit_plan server
+#
+# Enum values that define the commands available for the server. Note that all
+# ee_poses (defined in the 'ee_arm_link' frame) are relative to the 'world' frame.
+# There are 6 options:
+#   0) CMD_NONE - Command has not been set yet or has been cleared
+#   1) CMD_PLAN_POSE - Desired ee_pose which is made up of a position and orientation element
+#   2) CMD_PLAN_POSITION - Desired ee_position which is made up of a position element only; orientation is not constrained
+#   3) CMD_PLAN_ORIENTATION - Desired ee_orientation which is made up of an orientation element only; position is not constrained
+#   4) CMD_EXECUTE - Once a plan is available, this command executes the planned trajectory on the gazebo or physical robot
+#   5) CMD_PLAN_CARTESIAN - Desired ee_pose reached with a Cartesian path from the current pose
+int8 CMD_NONE = 0
+int8 CMD_PLAN_POSE = 1
+int8 CMD_PLAN_POSITION = 2
+int8 CMD_PLAN_ORIENTATION = 3
+int8 CMD_EXECUTE = 4
+int8 CMD_PLAN_CARTESIAN = 5
+int8 cmd
+
+# desired ee_pose, position, or orientation
+geometry_msgs/Pose ee_pose
+
+# Ordered Cartesian targets planned as one continuous trajectory.
+geometry_msgs/Pose[] waypoints
+
+# Keep wrist_rotate at its measured position for the entire planned path.
+# This is useful for tools whose roll must not change while the arm moves.
+bool lock_wrist_rotate
+float64 wrist_rotate_position
+float64 wrist_rotate_tolerance
+
+# Scale only the saved trajectory speed. Values are in (0, 1]; zero uses 1.0.
+float64 velocity_scaling_factor
+---
+# message if the planning or execution was successful; this is displayed in the custom GUI.
+std_msgs/String msg
+
+# boolean to easily check if the planning or execution was successful.
+bool success

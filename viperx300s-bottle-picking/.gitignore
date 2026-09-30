@@ -1,0 +1,15 @@
+# ROS 2 generated files
+build/
+install/
+log/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# VS Code
+.vscode/
+
+# Temporary files
+*.tmp
+*.log
