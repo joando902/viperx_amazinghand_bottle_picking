@@ -123,7 +123,7 @@ Keep this terminal running.
 # Terminal 5 — Bottle Picking
 
 Run the bottle picking program:
-
+(The bottle can be positioned 10 cm up, 10 cm to the left, and 10 cm down. )
 ```bash
 ros2 run interbotix_xsarm_perception viperx_amazing_hand_bottle_pick.py --ros-args \
   -p dry_run:=false \
@@ -151,32 +151,6 @@ Start the system in the following order:
 6. YOLOv8 Bottle Detection
 7. Coordinate Transformation
 8. Bottle Picking Program
-
----
-
-# System Overview
-
-```text
-RealSense Camera
-       │
-       ▼
- YOLOv8 Detection
-       │
-       ▼
-Bottle 3D Position
-       │
-       ▼
-Coordinate Transformation
-       │
-       ▼
- ViperX 300S + MoveIt
-       │
-       ▼
-   AmazingHand
-       │
-       ▼
-  Bottle Picking
-```
 
 ---
 
